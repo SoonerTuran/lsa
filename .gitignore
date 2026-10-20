@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+build/
+dist/
+
+# run outputs (checkpoints, caches, meshes) live outside git
+runs/
+*.pt
+*.npz

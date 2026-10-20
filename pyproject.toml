@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lsa"
+version = "0.1.0"
+description = "Latent Scene Algebra: DeepSDF-style decoder with learned latent operators, trained on analytic SDFs"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0",
+    "numpy",
+    "scikit-image",
+    "trimesh",
+    "pyyaml",
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+include = ["lsa*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
