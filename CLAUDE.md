@@ -56,3 +56,14 @@ Re-running `lsa.train` with the same `--out` resumes from `<out>/checkpoints/las
   *columns* of R (`matrix_to_rot6d` returns those columns).
 - `transform_sdf` duck-types T (anything with `R,t,s`, or a tuple) so `lsa/sdf` does not
   depend on `lsa/geom`.
+- **Canonical scale**: every shape is rescaled so its analytic bounding radius is exactly
+  0.4 (scale variation belongs to the Sim(3) pose, not the latent). Consequence: the
+  sphere family is a single shape (r = 0.4); per-family metrics are reported so this is
+  visible.
+- **Primitive params**: box = half extents; cylinder `(r, h)` and capsule `(r, h)` use
+  half heights (capsule segment from (0,-h,0) to (0,h,0)); torus `(R, r)` lies in the
+  xz-plane (axis y).
+- **Raw aspect ranges** (before normalisation): box half extents U[0.35,1]^3; cylinder
+  r,h ~ U[0.35,1]; capsule r ~ U[0.35,1], h ~ U[0,1]; torus R=1, r ~ U[0.3,0.6].
+  Thinnest feature after normalisation >= 0.09 (~3 voxels at 64^3 over [-1,1]^3).
+  Families are sampled uniformly.
