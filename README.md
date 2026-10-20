@@ -41,6 +41,6 @@ automatically after a disconnect — just re-run the cells.
 # Cell 3 — mount Drive, pip install -e, train (or resume) with the full config
 %run /content/lsa/colab/run_colab.py --config configs/phase1.yaml
 ```
-Private repo: add a Colab secret `GITHUB_TOKEN` and replace Cell 1 by
-`%run` of a copy of `colab/run_colab.py` (it clones with the token). Overrides:
-`%run /content/lsa/colab/run_colab.py --config configs/phase1.yaml --set train.steps=30000`.
+Config overrides go through `--set`, e.g.
+`%run /content/lsa/colab/run_colab.py --config configs/phase1.yaml --set train.steps=40000`.
+Use `--no-drive` to write under `/content/lsa_runs` instead of Drive.
