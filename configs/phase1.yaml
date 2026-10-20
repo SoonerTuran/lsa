@@ -1,0 +1,62 @@
+# Phase 1: DeepSDF auto-decoder on analytic primitives (full run, Colab T4/A100).
+phase: 1
+seed: 0
+device: auto            # cuda if available
+bound: 1.0              # world / query cube [-bound, bound]^3
+
+data:
+  n_shapes: 2000        # K training shapes
+  families: [sphere, box, cylinder, capsule, torus]
+  points_per_shape: 32768   # precomputed GT samples per shape (cached in <out>/data)
+  points_per_step: 4096     # random subset per shape per step
+  uniform_frac: 0.4
+  sigmas: [0.005, 0.03]
+  n_iters: 5
+
+model:
+  latent_dim: 128
+  hidden_dim: 512
+  n_layers: 8
+  skip_layers: [4]
+  weight_norm: true
+
+train:
+  steps: 30000
+  shapes_per_step: 64
+  lr_decoder: 5.0e-4
+  lr_latent: 1.0e-3
+  lr_decay_every: 10000
+  lr_decay_gamma: 0.5
+  delta: 0.1
+  latent_reg: 1.0e-4
+  latent_init_std: 0.01
+  amp: true             # CUDA only: bf16 on Ampere+ (A100), fp16 + GradScaler on T4
+  num_workers: 2
+
+log:
+  every: 100
+  eval_every: 2500
+  ckpt_every: 500
+  n_eval_shapes: 32     # fixed subset for IoU during training
+  n_viz_shapes: 4
+  grid_res: 64
+  slice_res: 128
+
+infer:                  # test-time latent optimisation on unseen shapes
+  n_shapes: 50
+  steps: 800
+  lr: 1.0e-2
+  lr_decay_at: 0.5
+  lr_decay_factor: 0.1
+  points_per_step: 8192
+  points_per_shape: 32768
+  seed_offset: 100000
+  n_viz: 4
+
+final:
+  n_train_eval: 200
+  n_chamfer: 20
+  chamfer_points: 30000
+  chamfer_res: 128
+  mesh_res: 64
+  interp_steps: 8

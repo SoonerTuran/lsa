@@ -85,3 +85,31 @@ Re-running `lsa.train` with the same `--out` resumes from `<out>/checkpoints/las
   (`torch.nn.utils.parametrizations.weight_norm`) on hidden layers only; no dropout, no
   output tanh. Hidden width is configurable (smoke config uses 128 to fit the 2-min CPU
   budget).
+- **Training data**: `points_per_shape` (32768 full / 4096 smoke) precomputed GT samples
+  per shape; each step draws a fresh random subset without replacement (`randperm`).
+  Loss = mean over shapes of clamped L1 + `latent_reg * mean_b ||z_b||^2`.
+- **LR schedule**: StepLR (x0.5 every `lr_decay_every` steps) on both param groups.
+  Full run: 30k steps, decay every 10k (~960 epochs over K=2000 at B=64).
+- **AMP**: autocast on CUDA only — bf16 on sm80+ (A100), fp16 + GradScaler on T4;
+  TF32 matmuls enabled. Loss and all evaluation run in fp32.
+- **Evaluation during training**: IoU / MAE on the first `n_eval_shapes` training shapes;
+  slices + PLYs for 4 fixed shapes = first box, cylinder, capsule, torus.
+  Final: first 200 training shapes (+ chamfer on the first 20), 50 unseen shapes.
+- **Test-time optimisation**: z ~ N(0, 0.01^2), Adam lr 1e-2 for 800 steps with a x0.1
+  decay at step 400 (as DeepSDF), 8192 points/step drawn *with* replacement from 32768
+  exact samples per shape, same clamped L1 + latent reg. All 50 shapes are optimised in one
+  Adam with the SUM of per-shape losses (Adam is elementwise -> identical to 50 separate
+  runs). Unseen shapes use seed `seed + 100000`; their spheres coincide with the training
+  sphere (degenerate family).
+- **Clamp caveat**: clamping the prediction zeroes its gradient once |pred| > delta, even
+  with the wrong sign. The default-initialised decoder outputs ~0.01-0.04 everywhere, so
+  training starts inside the band; kept as specified.
+- **Checkpoints**: `<out>/checkpoints/last.pt` (model, latents, optimiser, scheduler,
+  scaler, RNG, step, accumulated train time), written atomically every `ckpt_every`
+  steps. Re-running resumes; when training is already finished and `metrics.json` exists
+  for that step, the run is a no-op. Exact bitwise resume is not guaranteed (the
+  DataLoader shuffle order restarts).
+- **Interpolation demo**: first box -> first torus in the training set, 8 evenly spaced
+  alphas, PLYs + xz / xy slice strips in `<out>/interp/`.
+- **Colab**: Google's `colab-mcp` server is configured in `.mcp.json` (loads at session
+  start); `colab/run_colab.py` is the in-notebook launcher.

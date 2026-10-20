@@ -110,3 +110,33 @@ def slice_png(
     fig.tight_layout()
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(str(path))
+
+
+def strip_png(
+    sdf_fns: Sequence[SDFFn],
+    path: str | os.PathLike,
+    labels: Sequence[str] | None = None,
+    normal_axis: int = 1,
+    res: int = 128,
+    bound: float = 1.0,
+    vmax: float = 0.5,
+    device=None,
+) -> None:
+    """One row of slices (plane through the origin orthogonal to `normal_axis`, default the
+    xz-plane), one panel per SDF — e.g. a latent interpolation sequence."""
+    labels = list(labels) if labels is not None else [""] * len(sdf_fns)
+    fig = Figure(figsize=(2.2 * len(sdf_fns), 2.4), dpi=100)
+    FigureCanvasAgg(fig)
+    axes = fig.subplots(1, len(sdf_fns), squeeze=False)[0]
+    extent = (-bound, bound, -bound, bound)
+    for ax, fn, label in zip(axes, sdf_fns, labels):
+        img = plane_slice(fn, normal_axis, res, bound, device).T
+        ax.imshow(img, origin="lower", extent=extent, cmap="RdBu", vmin=-vmax, vmax=vmax)
+        if img.min() < 0 < img.max():
+            ax.contour(img, levels=[0.0], colors="k", linewidths=1.2, extent=extent)
+        ax.set_title(label, fontsize=8)
+        ax.set_xticks([])
+        ax.set_yticks([])
+    fig.tight_layout()
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(str(path))

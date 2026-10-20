@@ -68,3 +68,11 @@ def test_slice_png_analytic_and_learned(tmp_path):
     p2 = tmp_path / "cmp.png"
     slice_png([SPHERE, learned], p2, labels=["gt", "pred"], res=32, title="cmp")
     assert p2.exists() and p2.stat().st_size > 1000
+
+
+def test_strip_png(tmp_path):
+    from lsa.viz.mesh import strip_png
+
+    p = tmp_path / "strip.png"
+    strip_png([SPHERE, lambda x: SPHERE(x) + 0.1], p, labels=["a", "b"], res=24)
+    assert p.exists() and p.stat().st_size > 1000

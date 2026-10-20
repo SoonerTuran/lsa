@@ -1,0 +1,62 @@
+# Phase 1 smoke test: same pipeline, tiny sizes, <= 2 min on CPU.
+phase: 1
+seed: 0
+device: auto
+bound: 1.0
+
+data:
+  n_shapes: 50
+  families: [sphere, box, cylinder, capsule, torus]
+  points_per_shape: 4096
+  points_per_step: 1024
+  uniform_frac: 0.4
+  sigmas: [0.005, 0.03]
+  n_iters: 5
+
+model:
+  latent_dim: 32
+  hidden_dim: 128
+  n_layers: 8
+  skip_layers: [4]
+  weight_norm: true
+
+train:
+  steps: 400
+  shapes_per_step: 16
+  lr_decoder: 5.0e-4
+  lr_latent: 1.0e-3
+  lr_decay_every: 300
+  lr_decay_gamma: 0.5
+  delta: 0.1
+  latent_reg: 1.0e-4
+  latent_init_std: 0.01
+  amp: false
+  num_workers: 0
+
+log:
+  every: 50
+  eval_every: 200
+  ckpt_every: 200
+  n_eval_shapes: 8
+  n_viz_shapes: 4
+  grid_res: 32
+  slice_res: 64
+
+infer:
+  n_shapes: 4
+  steps: 100
+  lr: 1.0e-2
+  lr_decay_at: 0.5
+  lr_decay_factor: 0.1
+  points_per_step: 1024
+  points_per_shape: 4096
+  seed_offset: 100000
+  n_viz: 2
+
+final:
+  n_train_eval: 16
+  n_chamfer: 2
+  chamfer_points: 5000
+  chamfer_res: 64
+  mesh_res: 48
+  interp_steps: 5
