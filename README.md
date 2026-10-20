@@ -25,7 +25,7 @@ Re-running with the same `--out` resumes from `<out>/checkpoints/last.pt`. Outpu
 meshes + slices), `interp/` (latent interpolation), `metrics.json`.
 
 ## Google Colab (T4 / A100)
-Three cells (Runtime → Change runtime type → GPU). Cell 3 mounts Drive, installs the
+Open [colab/phase1.ipynb](https://colab.research.google.com/github/SoonerTuran/lsa/blob/main/colab/phase1.ipynb) in Colab and Run all, or paste these three cells (Runtime → Change runtime type → GPU). Cell 3 mounts Drive, installs the
 package, trains with the full config into `MyDrive/lsa_runs/phase1`, and resumes
 automatically after a disconnect — just re-run the cells.
 
