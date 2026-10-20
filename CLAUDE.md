@@ -74,3 +74,8 @@ Re-running `lsa.train` with the same `--out` resumes from `<out>/checkpoints/las
 - **Sample storage**: points/sdf stored float32; GT is the exact SDF evaluated in float64
   at the stored float32 points. Shape i's samples use rng seed `(seed, i)`. Training cache
   lives at `<out>/data/train.npz` and is rebuilt if specs/M/seed/sampling params differ.
+- **Metrics**: IoU = occupancy {sdf<0} IoU on a 64^3 grid over the world cube [-1,1]^3
+  (1.0 if both empty). MAE = mean |pred-gt| over grid points with |gt| < delta.
+  Chamfer-L2 = mean_a min_b |a-b|^2 + mean_b min_a |a-b|^2 (sum, as in DeepSDF) between
+  area-uniform samples of marching-cubes surfaces of both SDFs (same procedure for
+  analytic and learned SDFs); inf if a surface is missing.
