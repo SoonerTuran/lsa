@@ -50,3 +50,9 @@ Re-running `lsa.train` with the same `--out` resumes from `<out>/checkpoints/las
 
 ## Decisions
 (Ambiguities resolved with the simplest option; append new ones here.)
+- **Sim(3) action / composition**: `T(x) = s R x + t`; `A.compose(B)` = A∘B (B applied
+  first). Uniform rotations from normalised Gaussian quaternions.
+- **6D rotation**: Zhou et al. Gram-Schmidt; the two 3-vectors become the first two
+  *columns* of R (`matrix_to_rot6d` returns those columns).
+- `transform_sdf` duck-types T (anything with `R,t,s`, or a tuple) so `lsa/sdf` does not
+  depend on `lsa/geom`.
