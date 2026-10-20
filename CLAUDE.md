@@ -67,3 +67,10 @@ Re-running `lsa.train` with the same `--out` resumes from `<out>/checkpoints/las
   r,h ~ U[0.35,1]; capsule r ~ U[0.35,1], h ~ U[0,1]; torus R=1, r ~ U[0.3,0.6].
   Thinnest feature after normalisation >= 0.09 (~3 voxels at 64^3 over [-1,1]^3).
   Families are sampled uniformly.
+- **Near-surface noise**: near-surface points alternate between sigma 0.005 and 0.03
+  (isotropic 3D Gaussian), i.e. 30% / 30% of all samples. Projecting *uniform* cube points
+  piles many samples on box edges/corners (inside fraction: box ~13%, sphere ~30%); kept
+  as specified.
+- **Sample storage**: points/sdf stored float32; GT is the exact SDF evaluated in float64
+  at the stored float32 points. Shape i's samples use rng seed `(seed, i)`. Training cache
+  lives at `<out>/data/train.npz` and is rebuilt if specs/M/seed/sampling params differ.
