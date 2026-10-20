@@ -79,3 +79,9 @@ Re-running `lsa.train` with the same `--out` resumes from `<out>/checkpoints/las
   Chamfer-L2 = mean_a min_b |a-b|^2 + mean_b min_a |a-b|^2 (sum, as in DeepSDF) between
   area-uniform samples of marching-cubes surfaces of both SDFs (same procedure for
   analytic and learned SDFs); inf if a surface is missing.
+- **Decoder layout** (DeepSDF): 8 hidden ReLU layers of width 512 + linear output (9
+  linear layers). Hidden layer 4 receives concat([h, z, x]); layer 3 outputs
+  `512 - (latent_dim+3)` features so the concat is 512 wide. Weight norm
+  (`torch.nn.utils.parametrizations.weight_norm`) on hidden layers only; no dropout, no
+  output tanh. Hidden width is configurable (smoke config uses 128 to fit the 2-min CPU
+  budget).
